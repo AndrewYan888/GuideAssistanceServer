@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<!-- 引用db.properties配置文件 -->
+	<properties resource="SqlMap.properties"/>
+	
+	<!-- 设置的节点 -->
+	  <!-- <settings>
+	  	<setting name="" value=""/>
+	  </settings> -->
+	  
+	  <!-- 为Bean指定别名的节点 -->
+	  <!-- <typeAliases>
+	  	<typeAlias type=""/>
+	  </typeAliases> -->
+	  
+	  <!-- 
+          development : 开发模式
+          work : 工作模式
+      -->
+      <environments default="development">
+          <environment id="development">
+              <transactionManager type="JDBC" />
+              <!-- 配置数据库连接信息 -->
+              <dataSource type="POOLED">
+                 <property name="driver" value="${driver}" />
+                 <property name="url" value="${url}" />
+                <property name="username" value="${userName}" />
+                <property name="password" value="${password}" />
+             </dataSource>
+         </environment>
+     </environments>
+     
+     <!-- 实体映射文件 -->
+     <mappers>
+     	<!-- 注册userMapper.xml文件， 
+         userMapper.xml位于me.gacl.mapping这个包下，所以resource写成me/gacl/mapping/userMapper.xml-->
+         <mapper resource="com/zhongshan/ga/mybatis/mapping/userMapper.xml"/>
+         <!-- 注册UserMapper映射接口 -->
+         <mapper class="com.zhongshan.ga.mybatis.dao.IUserMapper"/>
+     </mappers>
+</configuration>
+

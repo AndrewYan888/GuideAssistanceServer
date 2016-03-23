@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http//www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.0.xsd"
+	>
+
+
+
+<!-- restlet路由配置 -->
+<bean name="root" class="org.restlet.ext.spring.SpringRouter">
+		
+	<property name="attachments">
+		<map>
+			<entry key="/User/{id}">
+			   <bean class="org.restlet.ext.spring.SpringFinder">  
+                      <lookup-method name="create" bean="UserResource" />  
+                  </bean> 
+               </entry>
+               <!-- <entry key="/student">
+			   <bean class="org.restlet.ext.spring.SpringFinder">  
+                      <lookup-method name="create" bean="StudentsResource" />  
+                  </bean> 
+               </entry> -->
+			
+		</map>
+	</property>
+</bean>
+
+<!-- restlet资源文件 -->
+<bean id="UserResource" class="com.zhongshan.ga.mobile.resource.UserResource" scope="prototype"/>
+<!-- <bean id="StudentsResource" class="org.lifeba.ws.resource.StudentsResource" scope="prototype"/> -->
+
+
+<!-- MyBatis整合配置 -->
+
+<!-- 引用数据库连接属性文件 -->
+<!-- <context:property-placeholder location="classpath:db.properties" /> -->
+
+<!-- 配置数据源 -->
+<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	数据库驱动
+	<property name="driverClass" value="${db.driver}"/>
+	数据库连接属性
+	<property name="url" value="${db.url}"/>
+	数据库用户名
+	<property name="userName" value="${db.userName}"/>
+	数据库密码
+	<property name="password" value="${db.password}"/>
+	初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3
+	<property name="initialPoolSize" value="1"/>
+	连接池中保留的最小连接数。
+	<property name="minPoolSize" value="1"/>
+	连接池中保留的最大连接数。Default: 15
+	<property name="maxPoolSize" value="300"/>
+	最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0
+	<property name="maxIdleTime" value="60"/>
+	当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 
+	<property name="acquireIncrement" value="5"/>
+	每60秒检查所有连接池中的空闲连接。Default: 0
+	<property name="idleConnectionTestPeriod" value="60"/>
+</bean> -->
+
+<!--把mybatis SqlSessionFactory的创建交由spring管理-->
+<!-- <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	获得数据源
+	<property name="dataSource" ref="dataSource"/>
+	获得Mybatis的配置文件
+	<property name="SqlMapConfig" value="classpath:SqlMapConfig.xml"/>
+</bean> -->
+
+<!-- 把mybatis sqlSession的创建交由spring管理 -->
+<!-- <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+	关联sqlSessionFactory
+	<constructor-arg index="0" ref="sqlSessionFactory"/>
+</bean> -->
+
+<!-- <bean id="UserDao" class="org.lifeba.ws.dao.IUserMaper">
+	<property name="sqlSession" ref="sqlSession"/>
+</bean> -->
+
+<!-- <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	注意：此处的数据源要与sqlSessionFactory中的dataSource相同
+	<property name="dataSource" ref="dataSource"></property>
+</bean> -->
+</beans>

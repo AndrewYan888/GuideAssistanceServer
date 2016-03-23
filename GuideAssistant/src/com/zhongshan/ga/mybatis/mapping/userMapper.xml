@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的
+  例如namespace="me.gacl.mapping.userMapper"就是me.gacl.mapping(包名)+userMapper(userMapper.xml文件去除后缀)
+ -->
+<mapper namespace="com.mybatis.mapping.userMapper">
+	<!-- 配置实体类的别名，配置实体类别名的目的是为了在引用实体类时可以使用实体类的别名来代替实体类，达到简写的目的 -->
+	<!-- <typeAliases> -->
+	<!-- 为实体类me.gacl.domain.User配置一个别名_User -->
+        <!-- <typeAlias type="me.gacl.domain.User" alias="_User"/> -->
+        <!-- 为me.gacl.domain包下的所有实体类配置别名，MyBatis默认的设置别名的方式就是去除类所在的包后的简单的类名
+        比如me.gacl.domain.User这个实体类的别名就会被设置成User
+         -->
+        <!-- <package name="me.gacl.domain"/>
+		<typeAlias type="com.mybaits.bean.User" alias="_User"/>
+	</typeAliases> -->
+	<!-- 在select标签中编写查询的SQL语句， 设置select标签的id属性为getUser，id属性值必须是唯一的，不能够重复
+            使用parameterType属性指明查询时使用的参数类型，resultType属性指明查询返回的结果集类型
+     resultType="me.gacl.domain.User"就表示将查询结果封装成一个User类的对象返回
+     User类就是users表所对应的实体类
+     -->
+     
+     <!-- 
+             根据id查询得到一个user对象
+      -->
+      <select id="getUser" parameterType="int"
+      	resultType="com.zhongshan.ga.mybatis.bean.User">
+      	select * from user where id=#{id}
+      </select>
+      
+      <!-- 添加用户信息 -->
+      <insert id="addUser" parameterType="com.zhongshan.ga.mybatis.bean.User">
+      	INSERT INTO USER (userName, userAge, userAddress) VALUES(#{userName}, #{userAge}, #{userAddress})
+      </insert>
+      
+      <!-- 根据用户id更新用户信息 -->
+      <update id="updateUser" parameterType="com.zhongshan.ga.mybatis.bean.User">
+      	UPDATE USER SET userName=#{userName}, userAge=#{userAge}, userAddress=#{userAddress}  where id=#{id}
+      </update>
+      
+      <!-- 根据用户Id删除用户信息 -->
+      <delete id="deleteUser" parameterType="int">
+      	DELETE FROM USER WHERE id = #{id}
+      </delete>
+      
+      <!-- 查询所有用户信息 -->
+      <select id="getAllUser" resultType="com.zhongshan.ga.mybatis.bean.User">
+      	select * from user
+      </select>
+      
+      <!-- 调用存储存过程 -->
+      <select id="getUserCount" parameterMap="getUserCountMap"
+      	statementType="CALLABLE">
+      	CALL mybatis.user_count(?,?)
+      </select>
+      
+      <parameterMap type="java.util.Map" id="getUserCountMap">
+      	<parameter property="sexid" mode="IN" jdbcType="INTEGER"/>
+      	<parameter property="usercount" mode="OUT" jdbcType="INTEGER"/>
+      </parameterMap>
+      
+      
+      <!-- 
+      	1. 一级缓存: 基于PerpetualCache 的 HashMap本地缓存，其存储作用域为 Session，当 Session flush 或 close 之后，该Session中的所有 Cache 就将清空。
+　　		2. 二级缓存与一级缓存其机制相同，默认也是采用 PerpetualCache，HashMap存储，不同在于其存储作用域为 Mapper(Namespace)，并且可自定义存储源，如 Ehcache。
+
+　　		3. 对于缓存数据更新机制，当某一个作用域(一级缓存Session/二级缓存Namespaces)的进行了 C/U/D 操作后，默认该作用域下所有 select 中的缓存将被clear。
+       -->
+      
+      <!-- 
+      	1. 映射语句文件中的所有select语句将会被缓存。
+
+　　		2. 映射语句文件中的所有insert，update和delete语句会刷新缓存。
+
+　　		3. 缓存会使用Least Recently Used（LRU，最近最少使用的）算法来收回。
+
+　　		4. 缓存会根据指定的时间间隔来刷新。
+
+　　		5. 缓存会存储1024个对象
+       -->
+      
+      <!-- 开启二级缓存 -->
+      <!-- 
+      eviction:指定缓存回收策略
+      flushInterval:指定自动刷新时间
+      size:指定最大的缓存想用对象数量
+      readOnley: true 只读
+       -->
+      <cache
+      	eviction="FIFO"
+      	flushInterval="60000"
+      	size="512"
+      	readOnly="true">
+      </cache>
+      
+      <!-- 定义可重用的SQL代码段 -->
+      <!-- <sql id=""></sql> -->
+      
+      <!-- <insert id="inser_userInfo" parameterType="UserInfo">  --> 
+  		<!-- include 引用可重用的SQL代码段 -->  
+  		<!-- INSERT INTO USERINFO(<include refid="demo_sql"/>) VALUES(#{code},#{name},#{sex},#{phone},#{money})  
+ 	 </insert>   -->
+ 	 
+ 	 <!-- sql语句中常用的特殊处理（in 查询） -->
+ 	 <!-- <select id="findWellsInfo" useCache="false" flushCache="true" resultType="hashmap">
+  SELECT ID AS FIELDCODE,NAME AS DATACATEGORYNAME,'' COLOR FROM IMS_WELL WHERE ID IN 
+  <foreach item="wellIds" index="index" collection="wellIds"
+  open="(" separator="," close=")">
+  #{wellIds}
+  </foreach>
+   </select> -->
+  <!--  我这里传入的参数是一个map ，map中有一个参数是数组wellIds，所以我写成collection="wellIds"；
+可以直接传入数组，写法：只需要把collection="wellIds"改成collection="array"；
+也可以传入List ，写法：只需要把collection="wellIds"改成collection="list"；
+ 还有很多特殊情况就不一一举例了，具体请详细阅读附件MyBatis3.2中文API -->
+ 	 
+</mapper>
